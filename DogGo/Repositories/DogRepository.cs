@@ -88,8 +88,9 @@ namespace DogGo.Repositories
                         SELECT d.Id AS DogId, OwnerId, d.Name AS DogName, o.Name AS OwnerName, d.Breed, Notes, ImageURL
                         FROM Dog d
                         JOIN Owner o ON o.Id = d.OwnerId
+                        WHERE d.Id = @id
                     ";
-
+                    cmd.Parameters.AddWithValue("@id", id);
                     SqlDataReader reader = cmd.ExecuteReader();
 
                     
