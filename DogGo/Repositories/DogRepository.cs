@@ -1,4 +1,5 @@
 ﻿using DogGo.Models;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -76,53 +77,60 @@ namespace DogGo.Repositories
             }
         }
 
-        //public Owner GetOwnerById(int id)
-        //{
-        //    using (SqlConnection conn = Connection)
-        //    {
-        //        conn.Open();
-        //        using (SqlCommand cmd = conn.CreateCommand())
-        //        {
-        //            cmd.CommandText = @"
-        //                SELECT o.Id AS OwnerId, Email, o.Name AS OwnerName, Address, NeighborhoodId, Phone, n.Name AS Area
-        //                FROM Owner o
-        //                JOIN Neighborhood n ON n.Id = NeighborHoodId
-        //                WHERE o.Id = @id
-        //            ";
+        public Dog GetDogById(int id)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"
+                        SELECT d.Id AS DogId, OwnerId, d.Name AS DogName, o.Name AS OwnerName, d.Breed, Notes, ImageURL
+                        FROM Dog d
+                        JOIN Owner o ON o.Id = d.OwnerId
+                    ";
 
-        //            cmd.Parameters.AddWithValue("@id", id);
+                    SqlDataReader reader = cmd.ExecuteReader();
 
-        //            SqlDataReader reader = cmd.ExecuteReader();
+                    
+                    if (reader.Read())
+                    {
+                        Dog dog = new Dog
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("DogId")),
+                            Name = reader.GetString(reader.GetOrdinal("DogName")),
+                            OwnerId = reader.GetInt32(reader.GetOrdinal("OwnerId")),
+                            Breed = reader.GetString(reader.GetOrdinal("Breed")),
+                            Owner = new Owner
+                            {
+                                Name = reader.GetString(reader.GetOrdinal("OwnerName"))
+                            }
+                        };
 
-        //            if (reader.Read())
-        //            {
-        //                Owner owner = new Owner
-        //                {
-        //                    Id = reader.GetInt32(reader.GetOrdinal("OwnerId")),
-        //                    Email = reader.GetString(reader.GetOrdinal("Email")),
-        //                    Name = reader.GetString(reader.GetOrdinal("OwnerName")),
-        //                    Address = reader.GetString(reader.GetOrdinal("Address")),
-        //                    NeighborhoodId = reader.GetInt32(reader.GetOrdinal("NeighborhoodId")),
-        //                    Phone = reader.GetString(reader.GetOrdinal("Phone")),
-        //                    Neighborhood = new Neighborhood
-        //                    {
-        //                        Id = reader.GetInt32(reader.GetOrdinal("NeighborhoodId")),
-        //                        Area = reader.GetString(reader.GetOrdinal("Area"))
-        //                    }
-        //                };
+                        if (reader.IsDBNull(reader.GetOrdinal("Notes")) == false)
+                        {
+                            dog.Notes = reader.GetString(reader.GetOrdinal("Notes"));
+                        }
 
-        //                reader.Close();
-        //                return owner;
-        //            }
-        //            else
-        //            {
-        //                reader.Close();
-        //                return null;
-        //            }
-        //        }
-        //    }
-        //}
-      
+                        if (reader.IsDBNull(reader.GetOrdinal("ImageUrl")) == false)
+                        {
+                            dog.Notes = reader.GetString(reader.GetOrdinal("ImageUrl"));
+                        }
+
+                        reader.Close();
+                        return dog;
+                    }
+                    else
+                    {
+                        reader.Close();
+                        return null;
+                    }
+
+                    
+                }
+            }
+        }
+
 
         public void AddDog(Dog dog)
         {
@@ -140,10 +148,9 @@ namespace DogGo.Repositories
                     cmd.Parameters.AddWithValue("@name", dog.Name);
                     cmd.Parameters.AddWithValue("@ownerId", dog.OwnerId);
                     cmd.Parameters.AddWithValue("@breed", dog.Breed);
-                    
-                    
 
-                    if(dog.ImageUrl != null)
+
+                    if (dog.ImageUrl != null)
                     {
                         cmd.Parameters.AddWithValue("@imageUrl", dog.ImageUrl);
                     }
@@ -168,37 +175,7 @@ namespace DogGo.Repositories
             }
         }
 
-        //public void UpdateOwner(Owner owner)
-        //{
-        //    using (SqlConnection conn = Connection)
-        //    {
-        //        conn.Open();
-
-        //        using (SqlCommand cmd = conn.CreateCommand())
-        //        {
-        //            cmd.CommandText = @"
-        //                    UPDATE Owner
-        //                    SET 
-        //                        [Name] = @name, 
-        //                        Email = @email, 
-        //                        Address = @address, 
-        //                        Phone = @phone, 
-        //                        NeighborhoodId = @neighborhoodId
-        //                    WHERE Id = @id";
-
-        //            cmd.Parameters.AddWithValue("@name", owner.Name);
-        //            cmd.Parameters.AddWithValue("@email", owner.Email);
-        //            cmd.Parameters.AddWithValue("@address", owner.Address);
-        //            cmd.Parameters.AddWithValue("@phone", owner.Phone);
-        //            cmd.Parameters.AddWithValue("@neighborhoodId", owner.NeighborhoodId);
-        //            cmd.Parameters.AddWithValue("@id", owner.Id);
-
-        //            cmd.ExecuteNonQuery();
-        //        }
-        //    }
-        //}
-
-        public void DeleteOwner(int ownerId)
+        public void UpdateDog(Dog dog)
         {
             using (SqlConnection conn = Connection)
             {
@@ -207,11 +184,42 @@ namespace DogGo.Repositories
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"
-                            DELETE FROM Owner
+                            UPDATE Dog
+                            SET 
+                                [Name] = @name, 
+                                Breed = @breed, 
+                                OwnerId = @ownerId, 
+                                Notes = @notes, 
+                                ImageUrl = @imageUrl
+                            WHERE Id = @id";
+
+                    cmd.Parameters.AddWithValue("@name", dog.Name);
+                    cmd.Parameters.AddWithValue("@breed", dog.Breed);
+                    cmd.Parameters.AddWithValue("@ownerId", dog.OwnerId);
+                    cmd.Parameters.AddWithValue("@notes", dog.Notes);
+                    cmd.Parameters.AddWithValue("@imageUrl", dog.ImageUrl);
+                    cmd.Parameters.AddWithValue("@id", dog.Id);
+                        
+
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public void DeleteDog(int dogId)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"
+                            DELETE FROM Dog
                             WHERE Id = @id
                         ";
 
-                    cmd.Parameters.AddWithValue("@id", ownerId);
+                    cmd.Parameters.AddWithValue("@id", dogId);
 
                     cmd.ExecuteNonQuery();
                 }
