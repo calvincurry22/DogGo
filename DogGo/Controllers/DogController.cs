@@ -10,65 +10,59 @@ using Microsoft.Extensions.Configuration;
 
 namespace DogGo.Controllers
 {
-    public class OwnersController : Controller
+    public class DogController : Controller
     {
-        private readonly OwnerRepository _ownerRepo;
+        private readonly DogRepository _dogRepo;
 
-        public OwnersController(IConfiguration config)
+        public DogController(IConfiguration config)
         {
-            _ownerRepo = new OwnerRepository(config);
+            _dogRepo = new DogRepository(config);
         }
-        // GET: OwnersController
+
+        // GET: DogController
         public ActionResult Index()
         {
-            List<Owner> owners = _ownerRepo.GetAllOwners();
+            List<Dog> dogs = _dogRepo.GetAllDogs();
 
-            return View(owners);
+            return View(dogs);
         }
 
-        // GET: OwnersController/Details/5
+        // GET: DogController/Details/5
         public ActionResult Details(int id)
         {
-            Owner owner = _ownerRepo.GetOwnerById(id);
-
-            if(owner == null)
-            {
-                NotFound();
-            }
-
-            return View(owner);
+            return View();
         }
 
-        // GET: OwnersController/Create
+        // GET: DogController/Create
         public ActionResult Create()
         {
             return View();
         }
 
-        // POST: OwnersController/Create
+        // POST: DogController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(Owner owner)
+        public ActionResult Create(Dog dog)
         {
             try
             {
-                _ownerRepo.AddOwner(owner);
+                _dogRepo.AddDog(dog);
 
                 return RedirectToAction("Index");
             }
             catch (Exception ex)
             {
-                return View(owner);
+                return View(dog);
             }
         }
 
-        // GET: OwnersController/Edit/5
+        // GET: DogController/Edit/5
         public ActionResult Edit(int id)
         {
             return View();
         }
 
-        // POST: OwnersController/Edit/5
+        // POST: DogController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Edit(int id, IFormCollection collection)
@@ -83,28 +77,24 @@ namespace DogGo.Controllers
             }
         }
 
-        // GET: OwnersController/Delete/5
+        // GET: DogController/Delete/5
         public ActionResult Delete(int id)
         {
-            Owner owner = _ownerRepo.GetOwnerById(id);
-
-            return View(owner);
+            return View();
         }
 
-        // POST: OwnersController/Delete/5
+        // POST: DogController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, Owner owner)
+        public ActionResult Delete(int id, IFormCollection collection)
         {
             try
             {
-                _ownerRepo.DeleteOwner(id);
-
-                return RedirectToAction("Index");
+                return RedirectToAction(nameof(Index));
             }
-            catch (Exception ex)
+            catch
             {
-                return View(owner);
+                return View();
             }
         }
     }
