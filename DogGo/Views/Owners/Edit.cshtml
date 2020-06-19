@@ -1,4 +1,4 @@
-﻿@model DogGo.Models.Owner
+﻿@model DogGo.Models.ViewModels.OwnerFormViewModel
 
 @{
     ViewData["Title"] = "Edit";
@@ -13,34 +13,40 @@
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="Id" class="control-label"></label>
-                <input asp-for="Id" type="hidden"class="form-control" />
-                <span asp-validation-for="Id" class="text-danger"></span>
+                <label asp-for="@Model.Owner.Id" class="control-label"></label>
+                <input asp-for="@Model.Owner.Id" type="hidden"class="form-control" />
+                <span asp-validation-for="@Model.Owner.Id" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Email" class="control-label"></label>
-                <input asp-for="Email" class="form-control" />
-                <span asp-validation-for="Email" class="text-danger"></span>
+                <label asp-for="@Model.Owner.Email" class="control-label"></label>
+                <input asp-for="@Model.Owner.Email" class="form-control" />
+                <span asp-validation-for="@Model.Owner.Email" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
+                <label asp-for="@Model.Owner.Name" class="control-label"></label>
+                <input asp-for="@Model.Owner.Name" class="form-control" />
+                <span asp-validation-for="@Model.Owner.Name" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Address" class="control-label"></label>
-                <input asp-for="Address" class="form-control" />
-                <span asp-validation-for="Address" class="text-danger"></span>
+                <label asp-for="@Model.Owner.Address" class="control-label"></label>
+                <input asp-for="@Model.Owner.Address" class="form-control" />
+                <span asp-validation-for="@Model.Owner.Address" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="NeighborhoodId" class="control-label"></label>
-                <input asp-for="NeighborhoodId" class="form-control" />
-                <span asp-validation-for="NeighborhoodId" class="text-danger"></span>
+                <label asp-for="@Model.Owner.NeighborhoodId" class="control-label"></label>
+                <select asp-for="@Model.Owner.NeighborhoodId" class="form-control">
+                    @foreach(Neighborhood neighborhood in Model.Neighborhoods)
+                    {
+                        <option value="@neighborhood.Id">@neighborhood.Area</option>
+                    }
+                </select>
+
+                <span asp-validation-for="@Model.Owner.NeighborhoodId" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Phone" class="control-label"></label>
-                <input asp-for="Phone" class="form-control" />
-                <span asp-validation-for="Phone" class="text-danger"></span>
+                <label asp-for="@Model.Owner.Phone" class="control-label"></label>
+                <input asp-for="@Model.Owner.Phone" class="form-control" />
+                <span asp-validation-for="@Model.Owner.Phone" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />

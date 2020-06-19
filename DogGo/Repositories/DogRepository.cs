@@ -132,6 +132,57 @@ namespace DogGo.Repositories
             }
         }
 
+        public List<Dog> GetDogsByOwnerId(int ownerId)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"
+                        SELECT d.Id AS DogId, OwnerId, d.Name AS DogName, o.Name AS OwnerName, d.Breed, Notes, ImageURL
+                        FROM Dog d
+                        JOIN Owner o ON o.Id = d.OwnerId
+                        WHERE o.Id = @id
+                    ";
+                    cmd.Parameters.AddWithValue("@id", ownerId);
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    List<Dog> dogs = new List<Dog>();
+
+                    while (reader.Read())
+                    {
+                        Dog dog = new Dog
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("DogId")),
+                            Name = reader.GetString(reader.GetOrdinal("DogName")),
+                            OwnerId = reader.GetInt32(reader.GetOrdinal("OwnerId")),
+                            Breed = reader.GetString(reader.GetOrdinal("Breed")),
+                            Owner = new Owner
+                            {
+                                Name = reader.GetString(reader.GetOrdinal("OwnerName"))
+                            }
+                        };
+
+                        if (reader.IsDBNull(reader.GetOrdinal("Notes")) == false)
+                        {
+                            dog.Notes = reader.GetString(reader.GetOrdinal("Notes"));
+                        }
+
+                        if (reader.IsDBNull(reader.GetOrdinal("ImageUrl")) == false)
+                        {
+                            dog.Notes = reader.GetString(reader.GetOrdinal("ImageUrl"));
+                        }
+
+                        dogs.Add(dog);
+                        
+                    }
+                        reader.Close();
+                        return dogs;
+                }
+            }
+        }
+
 
         public void AddDog(Dog dog)
         {

@@ -12,11 +12,12 @@ namespace DogGo.Repositories
     {
 
         private readonly IConfiguration _config;
-
+       
         // The constructor accepts an IConfiguration object as a parameter. This class comes from the ASP.NET framework and is useful for retrieving things out of the appsettings.json file like connection strings.
         public OwnerRepository(IConfiguration config)
         {
             _config = config;
+            
         }
 
         public SqlConnection Connection
@@ -80,7 +81,7 @@ namespace DogGo.Repositories
                     cmd.CommandText = @"
                         SELECT o.Id AS OwnerId, Email, o.Name AS OwnerName, Address, NeighborhoodId, Phone, n.Name AS Area
                         FROM Owner o
-                        JOIN Neighborhood n ON n.Id = NeighborHoodId
+                        JOIN Neighborhood n ON n.Id = NeighborhoodId  
                         WHERE o.Id = @id
                     ";
 
@@ -103,6 +104,9 @@ namespace DogGo.Repositories
                                 Id = reader.GetInt32(reader.GetOrdinal("NeighborhoodId")),
                                 Area = reader.GetString(reader.GetOrdinal("Area"))
                             }
+                            
+                           
+                            
                         };
 
                         reader.Close();
