@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using DogGo.Models;
+using DogGo.Models.ViewModels;
 using DogGo.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -13,11 +14,15 @@ namespace DogGo.Controllers
     public class WalkersController : Controller
     {
         private readonly WalkerRepository _walkerRepo;
+        private readonly WalksRepository _walksRepo;
+        private readonly NeighborhoodRepository _hoodRepo;
 
         // The constructor accepts an IConfiguration object as a parameter. This class comes from the ASP.NET framework and is useful for retrieving things out of the appsettings.json file like connection strings.
         public WalkersController(IConfiguration config)
         {
             _walkerRepo = new WalkerRepository(config);
+            _walksRepo = new WalksRepository(config);
+            _hoodRepo = new NeighborhoodRepository(config);
         }
 
         // GET: WalkersController
@@ -32,13 +37,21 @@ namespace DogGo.Controllers
         public ActionResult Details(int id)
         {
             Walker walker = _walkerRepo.GetWalkerById(id);
+            List<Walk> walks = _walksRepo.GetWalksByWalkerId(id);
+            Neighborhood hood = _hoodRepo.GetNeighborhoodById(walker.NeighborhoodId);
 
             if (walker == null)
             {
                 return NotFound();
             }
+            ProfileViewModel vm = new ProfileViewModel()
+            {
+                Walker = walker,
+                Walks = walks,
+                Neighborhood = hood    
+            };
 
-            return View(walker);
+            return View(vm);
         }
 
         // GET: WalkersController/Create
