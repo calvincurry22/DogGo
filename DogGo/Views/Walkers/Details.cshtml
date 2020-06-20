@@ -51,13 +51,13 @@
             {
                 <tr>
                     <td>
-                        @item.Date
+                        @item.Date.ToShortDateString()
                     </td>
                     <td>
                         @item.DogId
                     </td>
                     <td>
-                        @item.Duration
+                       @item.ConvertedDurationToMins(item)
                     </td>
                 </tr>
             }
@@ -66,6 +66,9 @@
 </div>
 <aside>
     <h2>Total Walk Time</h2>
+    <div>
+        @Model.ConvertedDurationToHrsMins(Model.Walks)
+    </div>
 </aside>
 <div>
     @Html.ActionLink("Edit", "Edit", new { id = Model.Walker.Id }) |
